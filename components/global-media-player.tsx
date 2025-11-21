@@ -528,10 +528,6 @@ export function GlobalMediaPlayer({ onToggleAIAsk }: GlobalMediaPlayerProps) {
         }));
         setSubtitleTracks(tracksWithActiveState);
 
-        // Don't load any subtitle by default - let user choose
-        setSubtitleData([]);
-        setCurrentSubtitle(null);
-
         const { serverUrl: _, user } = await getAuthData();
 
         const preferredSubtitleTrack = user?.Configuration
@@ -544,6 +540,7 @@ export function GlobalMediaPlayer({ onToggleAIAsk }: GlobalMediaPlayerProps) {
           : null;
         if (preferredSubtitleTrack)
           setActiveSubtitleTrack(preferredSubtitleTrack);
+        else setActiveSubtitleTrack(null); // Don't load any subtitle by default - let user choose
 
         // Process chapters if available
         if (details.Chapters && details.Chapters.length > 0) {
