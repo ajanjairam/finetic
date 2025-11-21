@@ -1,6 +1,6 @@
-"use server";
+'use server';
 
-import { cookies } from "next/headers";
+import { cookies } from 'next/headers';
 import { Jellyfin } from "@jellyfin/sdk";
 import { ItemsApi } from "@jellyfin/sdk/lib/generated-client/api/items-api";
 import { UserLibraryApi } from "@jellyfin/sdk/lib/generated-client/api/user-library-api";
@@ -17,13 +17,14 @@ import { UserItemDataDto } from "@jellyfin/sdk/lib/generated-client";
 // Type aliases for easier use
 type JellyfinItem = BaseItemDto;
 
+
 // Helper function to get auth data from cookies
 async function getAuthData() {
   const cookieStore = await cookies();
-  const authData = cookieStore.get("jellyfin-auth");
+  const authData = cookieStore.get('jellyfin-auth');
 
   if (!authData?.value) {
-    throw new Error("Not authenticated");
+    throw new Error('Not authenticated');
   }
 
   const parsed = JSON.parse(authData.value);
@@ -82,9 +83,7 @@ export async function fetchEpisodes(seasonId: string): Promise<JellyfinItem[]> {
   }
 }
 
-export async function fetchTVShowDetails(
-  tvShowId: string,
-): Promise<JellyfinItem | null> {
+export async function fetchTVShowDetails(tvShowId: string): Promise<JellyfinItem | null> {
   const { serverUrl, user } = await getAuthData();
   const jellyfinInstance = createJellyfinInstance();
   const api = jellyfinInstance.createApi(serverUrl);
@@ -103,9 +102,7 @@ export async function fetchTVShowDetails(
   }
 }
 
-export async function fetchEpisodeDetails(
-  episodeId: string,
-): Promise<JellyfinItem | null> {
+export async function fetchEpisodeDetails(episodeId: string): Promise<JellyfinItem | null> {
   const { serverUrl, user } = await getAuthData();
   const jellyfinInstance = createJellyfinInstance();
   const api = jellyfinInstance.createApi(serverUrl);
@@ -163,7 +160,7 @@ export async function getNextEpisodeForSeries(
 
   try {
     const itemsApi = getItemsApi(api);
-
+    
     // Get all episodes for the series with user data
     const { data } = await itemsApi.getItems({
       userId: user.Id,
@@ -185,11 +182,10 @@ export async function getNextEpisodeForSeries(
     }
 
     // First, look for episodes with resume positions (partially watched)
-    const resumableEpisodes = data.Items.filter(
-      (episode) =>
-        episode.UserData?.PlaybackPositionTicks &&
-        episode.UserData.PlaybackPositionTicks > 0 &&
-        !episode.UserData.Played,
+    const resumableEpisodes = data.Items.filter(episode => 
+      episode.UserData?.PlaybackPositionTicks && 
+      episode.UserData.PlaybackPositionTicks > 0 &&
+      !episode.UserData.Played
     );
 
     if (resumableEpisodes.length > 0) {
@@ -198,8 +194,8 @@ export async function getNextEpisodeForSeries(
     }
 
     // If no resumable episodes, find the first unwatched episode
-    const unwatchedEpisodes = data.Items.filter(
-      (episode) => !episode.UserData?.Played,
+    const unwatchedEpisodes = data.Items.filter(episode => 
+      !episode.UserData?.Played
     );
 
     if (unwatchedEpisodes.length > 0) {
