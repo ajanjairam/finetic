@@ -140,7 +140,11 @@ export async function updatePlayedStatus(
     const { data } = await itemsApi.updateItemUserData({
       userId: user.Id,
       itemId: episode.Id!,
-      updateUserItemDataDto: { Played: isPlayed },
+      updateUserItemDataDto: {
+        Played: isPlayed,
+        PlayedPercentage: isPlayed ? null : undefined,
+        PlaybackPositionTicks: isPlayed ? 0 : undefined
+      },
     });
     return data;
   } catch (error) {
