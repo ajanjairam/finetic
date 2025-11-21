@@ -99,7 +99,7 @@ export function GlobalMediaPlayer({ onToggleAIAsk }: GlobalMediaPlayerProps) {
   const [loading, setLoading] = useState(false);
   const [videoStarted, setVideoStarted] = useState(false);
   const [fetchingSubtitles, setFetchingSubtitles] = useState(false);
-
+  
   useEffect(() => {
     if (!activeSubtitleTrack) {
       // Turn off subtitles
@@ -142,7 +142,7 @@ export function GlobalMediaPlayer({ onToggleAIAsk }: GlobalMediaPlayerProps) {
   // Backdrop image state
   const [backdropImageLoaded, setBackdropImageLoaded] = useState(false);
   const [blurDataUrl, setBlurDataUrl] = useState<string | null>(null);
-
+  
   const [currentSubtitle, setCurrentSubtitle] = useState<{
     text: string;
     positionTop: boolean;
@@ -204,7 +204,7 @@ export function GlobalMediaPlayer({ onToggleAIAsk }: GlobalMediaPlayerProps) {
         };
       });
     },
-    [duration],
+    [duration]
   );
 
   const { serverUrl } = useAuth();
@@ -249,7 +249,7 @@ export function GlobalMediaPlayer({ onToggleAIAsk }: GlobalMediaPlayerProps) {
           selectedVersion.Id!,
           sessionId,
           positionTicks,
-          videoRef.current.paused,
+          videoRef.current.paused
         );
       }
     }, 10000); // Report every 10 seconds
@@ -270,7 +270,7 @@ export function GlobalMediaPlayer({ onToggleAIAsk }: GlobalMediaPlayerProps) {
         currentMedia.id,
         selectedVersion.Id!,
         playSessionId,
-        positionTicks,
+        positionTicks
       );
     }
 
@@ -296,7 +296,7 @@ export function GlobalMediaPlayer({ onToggleAIAsk }: GlobalMediaPlayerProps) {
         selectedVersion.Id!,
         playSessionId,
         positionTicks,
-        true, // isPaused = true
+        true // isPaused = true
       );
     }
   }, [playSessionId, currentMedia, selectedVersion]);
@@ -318,7 +318,7 @@ export function GlobalMediaPlayer({ onToggleAIAsk }: GlobalMediaPlayerProps) {
       // Update chapters end times when duration is available
       if (mediaDetails?.Chapters && mediaDetails.Chapters.length > 0) {
         const convertedChapters = convertJellyfinChapters(
-          mediaDetails.Chapters,
+          mediaDetails.Chapters
         );
         setChapters(convertedChapters);
       }
@@ -419,7 +419,7 @@ export function GlobalMediaPlayer({ onToggleAIAsk }: GlobalMediaPlayerProps) {
 
       return null;
     },
-    [subtitleData, processSubtitleText],
+    [subtitleData, processSubtitleText]
   );
 
   useEffect(() => {
@@ -435,10 +435,9 @@ export function GlobalMediaPlayer({ onToggleAIAsk }: GlobalMediaPlayerProps) {
   useEffect(() => {
     if (mediaDetails && !blurDataUrl) {
       // Get blur hash for backdrop
-      const backdropImageTag =
-        mediaDetails.Type === "Episode"
-          ? mediaDetails.ParentBackdropImageTags?.[0]
-          : mediaDetails.BackdropImageTags?.[0];
+      const backdropImageTag = mediaDetails.Type === "Episode" 
+        ? mediaDetails.ParentBackdropImageTags?.[0]
+        : mediaDetails.BackdropImageTags?.[0];
       const blurHash =
         mediaDetails.ImageBlurHashes?.["Backdrop"]?.[backdropImageTag!] || "";
 
@@ -486,7 +485,7 @@ export function GlobalMediaPlayer({ onToggleAIAsk }: GlobalMediaPlayerProps) {
         // If a version was selected in MediaActions, try to find it in the fetched details
         if (currentMedia.selectedVersion) {
           const matchingSource = details.MediaSources.find(
-            (source) => source.Id === currentMedia.selectedVersion!.Id,
+            (source) => source.Id === currentMedia.selectedVersion!.Id
           );
           if (matchingSource) {
             sourceToUse = matchingSource;
@@ -505,21 +504,21 @@ export function GlobalMediaPlayer({ onToggleAIAsk }: GlobalMediaPlayerProps) {
 
         // Generate stream URL with bitrate setting
         const bitrateOption = BITRATE_OPTIONS.find(
-          (option) => option.value === videoBitrate,
+          (option) => option.value === videoBitrate
         );
         const bitrate = bitrateOption?.bitrate || 0; // 0 means auto/no limit
         const streamUrl = await getStreamUrl(
           currentMedia.id,
           sourceToUse.Id!,
           undefined,
-          bitrate,
+          bitrate
         );
         setStreamUrl(streamUrl);
 
         // Start fetching subtitle data asynchronously without blocking playback
         const subtitleTracksList = await getSubtitleTracks(
           currentMedia.id,
-          sourceToUse.Id!,
+          sourceToUse.Id!
         );
         // Mark all subtitle tracks as inactive initially
         const tracksWithActiveState = subtitleTracksList.map((track) => ({
@@ -553,7 +552,7 @@ export function GlobalMediaPlayer({ onToggleAIAsk }: GlobalMediaPlayerProps) {
         // Fetch intro/outro segments asynchronously
         try {
           const segments = await fetchIntroOutro(
-            currentMedia.selectedVersion?.Id || sourceToUse.Id!,
+            currentMedia.selectedVersion?.Id || sourceToUse.Id!
           );
           console.log("Fetched intro/outro segments:", segments);
           if (segments && segments.Items) {
@@ -651,7 +650,7 @@ export function GlobalMediaPlayer({ onToggleAIAsk }: GlobalMediaPlayerProps) {
         chapters={chapters}
         onCustomSubtitleChange={(subtitleTrack) =>
           setActiveSubtitleTrack(subtitleTrack)
-        }
+              }
       >
         {/* Always render the video component so it can load in the background */}
         {streamUrl && mediaDetails && (
@@ -715,7 +714,7 @@ export function GlobalMediaPlayer({ onToggleAIAsk }: GlobalMediaPlayerProps) {
                     }
                   />
                 )}
-
+                
                 {/* Actual backdrop image */}
                 <img
                   src={`${serverUrl}/Items/${
@@ -807,7 +806,7 @@ export function GlobalMediaPlayer({ onToggleAIAsk }: GlobalMediaPlayerProps) {
                       Ends at{" "}
                       {formatEndTime(
                         0,
-                        ticksToSeconds(mediaDetails.RunTimeTicks),
+                        ticksToSeconds(mediaDetails.RunTimeTicks)
                       )}
                     </motion.div>
                   )}
@@ -1018,7 +1017,7 @@ export function GlobalMediaPlayer({ onToggleAIAsk }: GlobalMediaPlayerProps) {
                                     const target = e.target as HTMLImageElement;
                                     target.style.display = "none";
                                     target.nextElementSibling!.classList.remove(
-                                      "hidden",
+                                      "hidden"
                                     );
                                   }}
                                 />
