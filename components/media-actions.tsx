@@ -52,7 +52,7 @@ export function MediaActions({ movie, show, episode }: MediaActionsProps) {
     useState<MediaSourceInfo | null>(null);
   const [userPolicy, setUserPolicy] = useState<UserPolicy | null>(null);
   const [userData, setUserData] = useState<UserItemDataDto | null>(
-    episode?.UserData || null,
+    episode?.UserData || movie?.UserData || null,
   );
 
   // Determine if this is a resume or new play
@@ -80,7 +80,7 @@ export function MediaActions({ movie, show, episode }: MediaActionsProps) {
         if (currentUser?.Id && media?.Id) {
           const userWithPolicy = await getUserWithPolicy(
             currentUser.Id,
-            media.Id,
+            media.Id
           );
           if (userWithPolicy?.Policy) {
             setUserPolicy(userWithPolicy.Policy);
@@ -133,8 +133,8 @@ export function MediaActions({ movie, show, episode }: MediaActionsProps) {
   };
 
   const handlePlayedStatus = async () => {
-    if (episode && userData)
-      setUserData(await updatePlayedStatus(episode, !userData.Played));
+    if (userData && (episode || movie))
+      setUserData(await updatePlayedStatus((episode || movie)!, !userData.Played));
   };
 
   // Helper function to get display name for a media source
@@ -144,7 +144,7 @@ export function MediaActions({ movie, show, episode }: MediaActionsProps) {
     // If we can't parse details from the name, try to use DisplayTitle from video stream
     if (detailsFromName === "Unknown" && source.MediaStreams) {
       const videoStream = source.MediaStreams.find(
-        (stream) => stream.Type === "Video",
+        (stream) => stream.Type === "Video"
       );
       if (videoStream?.DisplayTitle) {
         return getMediaDetailsFromName(videoStream.DisplayTitle);
@@ -161,7 +161,7 @@ export function MediaActions({ movie, show, episode }: MediaActionsProps) {
     }
 
     const audioStreams = source.MediaStreams.filter(
-      (stream) => stream.Type === "Audio",
+      (stream) => stream.Type === "Audio"
     );
 
     const result = source.MediaStreams.some(
@@ -169,7 +169,7 @@ export function MediaActions({ movie, show, episode }: MediaActionsProps) {
         stream.Type === "Audio" &&
         (stream.Codec?.toLowerCase().includes("ac3") ||
           stream.Codec?.toLowerCase().includes("dolby") ||
-          stream.DisplayTitle?.toLowerCase().includes("dolby")),
+          stream.DisplayTitle?.toLowerCase().includes("dolby"))
     );
 
     return result;
@@ -182,14 +182,14 @@ export function MediaActions({ movie, show, episode }: MediaActionsProps) {
     }
 
     const audioStreams = source.MediaStreams.filter(
-      (stream) => stream.Type === "Audio",
+      (stream) => stream.Type === "Audio"
     );
 
     const result = source.MediaStreams.some(
       (stream) =>
         stream.Type === "Audio" &&
         (stream.Codec?.toLowerCase().includes("truehd") ||
-          stream.DisplayTitle?.toLowerCase().includes("truehd")),
+          stream.DisplayTitle?.toLowerCase().includes("truehd"))
     );
 
     return result;
@@ -202,7 +202,7 @@ export function MediaActions({ movie, show, episode }: MediaActionsProps) {
     }
 
     const videoStreams = source.MediaStreams.filter(
-      (stream) => stream.Type === "Video",
+      (stream) => stream.Type === "Video"
     );
 
     const result = source.MediaStreams.some(
@@ -210,7 +210,7 @@ export function MediaActions({ movie, show, episode }: MediaActionsProps) {
         stream.Type === "Video" &&
         (stream.VideoRange?.toLowerCase().includes("dovi") ||
           stream.DisplayTitle?.toLowerCase().includes("dolby vision") ||
-          stream.Profile?.toLowerCase().includes("dolby")),
+          stream.Profile?.toLowerCase().includes("dolby"))
     );
 
     return result;
@@ -222,14 +222,14 @@ export function MediaActions({ movie, show, episode }: MediaActionsProps) {
     }
 
     const audioStreams = source.MediaStreams.filter(
-      (stream) => stream.Type === "Audio",
+      (stream) => stream.Type === "Audio"
     );
 
     const result = source.MediaStreams.some(
       (stream) =>
         stream.Type === "Audio" &&
         (stream.Codec?.toLowerCase().includes("dts-hd") ||
-          stream.DisplayTitle?.toLowerCase().includes("dts-hd")),
+          stream.DisplayTitle?.toLowerCase().includes("dts-hd"))
     );
     return result;
   };
