@@ -122,10 +122,10 @@ export async function fetchEpisodeDetails(episodeId: string): Promise<JellyfinIt
 }
 
 export async function updatePlayedStatus(
-  episode: JellyfinItem,
+  item: JellyfinItem,
   isPlayed: boolean,
 ): Promise<UserItemDataDto | null> {
-  if (!episode.Id) return null;
+  if (!item.Id) return null;
 
   const { serverUrl, user } = await getAuthData();
   const jellyfinInstance = createJellyfinInstance();
@@ -136,7 +136,7 @@ export async function updatePlayedStatus(
     const itemsApi = getItemsApi(api);
     const { data } = await itemsApi.updateItemUserData({
       userId: user.Id,
-      itemId: episode.Id!,
+      itemId: item.Id,
       updateUserItemDataDto: {
         Played: isPlayed,
         PlayedPercentage: isPlayed ? null : undefined,
@@ -145,7 +145,7 @@ export async function updatePlayedStatus(
     });
     return data;
   } catch (error) {
-    console.error("Failed to fetch episode details:", error);
+    console.error("Failed to fetch item details:", error);
     return null;
   }
 }
