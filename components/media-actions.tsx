@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { MediaInfoDialog } from "@/components/media-info-dialog";
 import { ImageEditorDialog } from "@/components/image-editor-dialog";
-import { Info, Download, Play, ArrowLeft } from "lucide-react";
+import { Info, Download, Play, Check } from "lucide-react";
 import {
   getDownloadUrl,
   getStreamUrl,
@@ -36,6 +36,8 @@ import {
 } from "@/lib/utils";
 import { useMediaPlayer } from "@/contexts/MediaPlayerContext";
 import { DolbyDigital, DolbyTrueHd, DolbyVision, DtsHd } from "./icons/codecs";
+import { UserItemDataDto } from "@jellyfin/sdk/lib/generated-client";
+import { updatePlayedStatus } from "@/app/actions/tv-shows";
 
 interface MediaActionsProps {
   movie?: JellyfinItem;
@@ -49,6 +51,9 @@ export function MediaActions({ movie, show, episode }: MediaActionsProps) {
   const [selectedVersion, setSelectedVersion] =
     useState<MediaSourceInfo | null>(null);
   const [userPolicy, setUserPolicy] = useState<UserPolicy | null>(null);
+  const [userData, setUserData] = useState<UserItemDataDto | null>(
+    episode?.UserData || null,
+  );
 
   // Determine if this is a resume or new play
   const hasProgress =
@@ -75,7 +80,7 @@ export function MediaActions({ movie, show, episode }: MediaActionsProps) {
         if (currentUser?.Id && media?.Id) {
           const userWithPolicy = await getUserWithPolicy(
             currentUser.Id,
-            media.Id
+            media.Id,
           );
           if (userWithPolicy?.Policy) {
             setUserPolicy(userWithPolicy.Policy);
@@ -127,6 +132,11 @@ export function MediaActions({ movie, show, episode }: MediaActionsProps) {
     window.open(await getDownloadUrl(selectedVersion.Id!), "_blank");
   };
 
+  const handlePlayedStatus = async () => {
+    if (episode && userData)
+      setUserData(await updatePlayedStatus(episode, !userData.Played));
+  };
+
   // Helper function to get display name for a media source
   const getMediaSourceDisplayName = (source: MediaSourceInfo) => {
     const detailsFromName = getMediaDetailsFromName(source.Name!);
@@ -134,7 +144,7 @@ export function MediaActions({ movie, show, episode }: MediaActionsProps) {
     // If we can't parse details from the name, try to use DisplayTitle from video stream
     if (detailsFromName === "Unknown" && source.MediaStreams) {
       const videoStream = source.MediaStreams.find(
-        (stream) => stream.Type === "Video"
+        (stream) => stream.Type === "Video",
       );
       if (videoStream?.DisplayTitle) {
         return getMediaDetailsFromName(videoStream.DisplayTitle);
@@ -151,7 +161,7 @@ export function MediaActions({ movie, show, episode }: MediaActionsProps) {
     }
 
     const audioStreams = source.MediaStreams.filter(
-      (stream) => stream.Type === "Audio"
+      (stream) => stream.Type === "Audio",
     );
 
     const result = source.MediaStreams.some(
@@ -159,7 +169,7 @@ export function MediaActions({ movie, show, episode }: MediaActionsProps) {
         stream.Type === "Audio" &&
         (stream.Codec?.toLowerCase().includes("ac3") ||
           stream.Codec?.toLowerCase().includes("dolby") ||
-          stream.DisplayTitle?.toLowerCase().includes("dolby"))
+          stream.DisplayTitle?.toLowerCase().includes("dolby")),
     );
 
     return result;
@@ -172,14 +182,14 @@ export function MediaActions({ movie, show, episode }: MediaActionsProps) {
     }
 
     const audioStreams = source.MediaStreams.filter(
-      (stream) => stream.Type === "Audio"
+      (stream) => stream.Type === "Audio",
     );
 
     const result = source.MediaStreams.some(
       (stream) =>
         stream.Type === "Audio" &&
         (stream.Codec?.toLowerCase().includes("truehd") ||
-          stream.DisplayTitle?.toLowerCase().includes("truehd"))
+          stream.DisplayTitle?.toLowerCase().includes("truehd")),
     );
 
     return result;
@@ -192,7 +202,7 @@ export function MediaActions({ movie, show, episode }: MediaActionsProps) {
     }
 
     const videoStreams = source.MediaStreams.filter(
-      (stream) => stream.Type === "Video"
+      (stream) => stream.Type === "Video",
     );
 
     const result = source.MediaStreams.some(
@@ -200,7 +210,7 @@ export function MediaActions({ movie, show, episode }: MediaActionsProps) {
         stream.Type === "Video" &&
         (stream.VideoRange?.toLowerCase().includes("dovi") ||
           stream.DisplayTitle?.toLowerCase().includes("dolby vision") ||
-          stream.Profile?.toLowerCase().includes("dolby"))
+          stream.Profile?.toLowerCase().includes("dolby")),
     );
 
     return result;
@@ -212,14 +222,14 @@ export function MediaActions({ movie, show, episode }: MediaActionsProps) {
     }
 
     const audioStreams = source.MediaStreams.filter(
-      (stream) => stream.Type === "Audio"
+      (stream) => stream.Type === "Audio",
     );
 
     const result = source.MediaStreams.some(
       (stream) =>
         stream.Type === "Audio" &&
         (stream.Codec?.toLowerCase().includes("dts-hd") ||
-          stream.DisplayTitle?.toLowerCase().includes("dts-hd"))
+          stream.DisplayTitle?.toLowerCase().includes("dts-hd")),
     );
     return result;
   };
@@ -293,6 +303,14 @@ export function MediaActions({ movie, show, episode }: MediaActionsProps) {
         <Button variant="outline" size="icon" onClick={download}>
           <Download className="h-4 w-4" />
         </Button>
+
+        {userData && (
+          <Button variant="outline" size="icon" onClick={handlePlayedStatus}>
+            <Check
+              className={`h-4 w-4 ${userData.Played ? "text-green-500" : ""}`}
+            />
+          </Button>
+        )}
 
         <Dialog>
           <DialogTrigger asChild>
