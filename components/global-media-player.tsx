@@ -534,8 +534,6 @@ export function GlobalMediaPlayer({ onToggleAIAsk }: GlobalMediaPlayerProps) {
 
         const { serverUrl: _, user } = await getAuthData();
 
-        console.log("User", user);
-
         const preferredSubtitleTrack = user?.Configuration
           ?.SubtitleLanguagePreference
           ? tracksWithActiveState.find(
