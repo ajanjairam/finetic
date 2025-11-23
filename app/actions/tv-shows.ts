@@ -12,7 +12,6 @@ import { SortOrder } from "@jellyfin/sdk/lib/generated-client/models/sort-order"
 import { ItemFilter } from "@jellyfin/sdk/lib/generated-client/models/item-filter";
 import { getItemsApi } from "@jellyfin/sdk/lib/utils/api/items-api";
 import { createJellyfinInstance } from "@/lib/utils";
-import { UserItemDataDto } from "@jellyfin/sdk/lib/generated-client";
 
 // Type aliases for easier use
 type JellyfinItem = BaseItemDto;
@@ -117,35 +116,6 @@ export async function fetchEpisodeDetails(episodeId: string): Promise<JellyfinIt
     return data;
   } catch (error) {
     console.error("Failed to fetch episode details:", error);
-    return null;
-  }
-}
-
-export async function updatePlayedStatus(
-  item: JellyfinItem,
-  isPlayed: boolean,
-): Promise<UserItemDataDto | null> {
-  if (!item.Id) return null;
-
-  const { serverUrl, user } = await getAuthData();
-  const jellyfinInstance = createJellyfinInstance();
-  const api = jellyfinInstance.createApi(serverUrl);
-  api.accessToken = user.AccessToken;
-
-  try {
-    const itemsApi = getItemsApi(api);
-    const { data } = await itemsApi.updateItemUserData({
-      userId: user.Id,
-      itemId: item.Id,
-      updateUserItemDataDto: {
-        Played: isPlayed,
-        PlayedPercentage: isPlayed ? null : undefined,
-        PlaybackPositionTicks: isPlayed ? 0 : undefined
-      },
-    });
-    return data;
-  } catch (error) {
-    console.error("Failed to fetch item details:", error);
     return null;
   }
 }

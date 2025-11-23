@@ -37,7 +37,7 @@ import {
 import { useMediaPlayer } from "@/contexts/MediaPlayerContext";
 import { DolbyDigital, DolbyTrueHd, DolbyVision, DtsHd } from "./icons/codecs";
 import { UserItemDataDto } from "@jellyfin/sdk/lib/generated-client";
-import { updatePlayedStatus } from "@/app/actions/tv-shows";
+import { updatePlayedStatus } from "@/app/actions/media";
 
 interface MediaActionsProps {
   movie?: JellyfinItem;
